@@ -42,9 +42,8 @@
         <div v-if="step == 2">
             <div class="stepper-pane">
                 <div class="grid-selection">
-                    <div id="item-1" class="item item-1" v-for="(img, index) in levelSelected.availableProducts">
-
-                        <img class="image" :src="getSrc(img.nombre)" @click="toggle(img)">
+                    <div id="item-1" class="item item-1" v-for="(product, index) in selectedProducts" :key="product.id_prod_disp">
+                        <img class="image" :src="getSrc(product.nombre_prod_disp)" @click="toggle(product.nombre_prod_disp)">
                         <div class="wrapper">
                             <button class="plusminus" @click="handleMinus(index)">-</button>
                             <span class="num">{{ img.cantidad }}</span>
@@ -187,7 +186,6 @@ export default {
             this.indexLevel = this.levels.indexOf(this.levelSelected)
             if (this.levels[this.indexLevel].availableProducts) {
                 this.available = JSON.parse(JSON.stringify(this.levelSelected.availableProducts));
-            console.log(this.levelSelected.availableProducts);
             }
         },
 
