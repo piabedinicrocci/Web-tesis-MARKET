@@ -33,7 +33,7 @@
                     <select name="select" id="level" v-model="levelSelected" @change="getIndex()">
                         <option value="" disabled selected>Nivel</option>
                         <option v-for="level in levels" :value="level">
-                            {{ level.nombre_nivel }}
+                            {{ level.nombre}}
                         </option>
                     </select>
                 </div>

@@ -33,7 +33,7 @@
                 <div class="content-select">
                     <select name="select" v-model="levelSelected" @change="getIndex()">
                         <option v-for="level in levels" :value="level">
-                        {{level.nombre_nivel}}
+                        {{level.nombre}}
                         </option> 
                     </select>
                 </div>
@@ -233,6 +233,7 @@ export default {
         axios
           .put(this.url + '/level?id=' + dif, this.estanterias)
           .then(response => {
+
           });
       }
       this.$router.push({ name: 'home' });
@@ -282,12 +283,13 @@ export default {
       estanterias.forEach(x => {
         if (x.productos) {
           x.productos.forEach(prod => {
-            let nombre = prod.split("-")[0];
+            let nombre = prod.nombre.split("-")[0];
             this.estanterias[x.gondola][nombre]++;
           });
         }
       });
       this.original = JSON.parse(JSON.stringify(this.estanterias));
+      console.log(this.original);
     },
     convertArrayToObject(array) {
       const initialValue = {};
