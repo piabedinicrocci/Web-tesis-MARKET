@@ -273,6 +273,7 @@ export default {
         axios.get(this.url + '/level/' + this.levelSelected.dificultad)
           .then(response => {
             this.generateEstanterias(response.data);
+            console.log(response.data)
           });
       }
     },
