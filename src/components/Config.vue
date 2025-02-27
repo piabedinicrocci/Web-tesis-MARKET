@@ -126,13 +126,15 @@ export default {
     mounted() {
 
         axios
-            //.get("http://localhost:8081/level")
-            .get(this.url + '/level')
+            .get(this.url + "/level", {
+                headers: { Authorization: sessionStorage.getItem("token")} // O sessionStorage
+            })
             .then(response => {
                 this.levels = response.data;
+            })
+            .catch(error => {
+                console.error("Error obteniendo niveles:", error);
             });
-
-
     },
     computed: {
         stepperProgress() {
@@ -153,33 +155,39 @@ export default {
                 this.levels[this.indexLevel].availableProducts[index].cantidad++
         },
         async iniciar() {
+
+            const token = sessionStorage.getItem("token"); 
+
             if (this.levels[this.indexLevel].availableProducts && !this.ObjCompare(this.available, this.levels[this.indexLevel].availableProducts)) {
                 axios
-                    .post(this.url + '/level/' + this.levelSelected.dificultad, { remember: this.levels[this.indexLevel].availableProducts })
-                    //  .post("http://localhost:8081/level/"+this.levelSelected.dificultad,this.levels[this.indexLevel].availableProducts)
-                    //.get('https://firebase-viviant.herokuapp.com/level')
+                    .post(this.url + '/level/' + this.levelSelected.dificultad, 
+                    { remember: this.levels[this.indexLevel].availableProducts},
+                    {
+                     headers: { Authorization: token } // Agrega el token al header
+                 })
                     .then(response => {
 
                     });
             }
-            axios.post(this.url + '/result',{
+
+            axios.post(this.url + '/result', {
                 name: this.name,
                 level: this.levelSelected.dificultad.toString()
+            }, {
+                headers: { Authorization: token } // Agrega el token al header
             }).then(res => {
-                this.id = res.data
-                axios.post(this.url + '/action',
-                    {
-                        data: { action: "config", level: this.levelSelected.dificultad.toString()}
-                    }
-                ).then(response => {
-                    this.$router.push({ name: 'simulation', params: { nivel: this.levelSelected.dificultad.toString(), doc: this.id, sound:this.soundOn.toString() } })
+                    this.id = res.data
+                    axios.post(this.url + '/action',
+                        {
+                            data: { action: "config", level: this.levelSelected.dificultad.toString()}
+                        }
+                    ).then(response => {
+                        this.$router.push({ name: 'simulation', params: { nivel: this.levelSelected.dificultad.toString(), doc: this.id, sound:this.soundOn.toString() } })
+                    })
                 })
-            })
 
-
-
-
-        },
+            },
+            
         getSrc(img) {
             return this.images.find(x => x.id == img) ? this.images.find(x => x.id == img).dir : null
         },

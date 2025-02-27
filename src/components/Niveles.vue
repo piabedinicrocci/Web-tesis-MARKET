@@ -169,11 +169,16 @@ export default {
     }
   },
   mounted() {
+    console.log("Token almacenado:", sessionStorage.getItem("token"));
+
     axios
-      .get(this.url + '/level')
+      .get(this.url + "/level", {
+        headers: { Authorization: sessionStorage.getItem("token") }
+      })
       .then(response => {
         this.levels = response.data;
-      });
+      })
+
   },
   watch: {
     newLevelName(newVal) {
@@ -231,12 +236,15 @@ export default {
         dif = this.newLevelName;
       if (!this.ObjCompare(this.estanterias, this.original)) {
         axios
-          .put(this.url + '/level?id=' + dif, this.estanterias)
-          .then(response => {
+        .put(this.url + "/level?id=" + dif, this.estanterias, {
+          headers: { Authorization: sessionStorage.getItem("token") }
+        })
+        .then(response => {
+          console.log("Nivel actualizado correctamente");
+        })
 
-          });
       }
-      this.$router.push({ name: 'home' });
+      this.$router.push({ name: 'inicio' });
     },
     getSrc(img) {
       return this.images.find(x => x.id == img) ? this.images.find(x => x.id == img).dir : this.images[0];
@@ -270,10 +278,16 @@ export default {
           this.estanterias[i] = this.convertArrayToObject(this.images);
         }
       } else {
-        axios.get(this.url + '/level/' + this.levelSelected.dificultad)
+        axios
+          .get(this.url + "/level/" + this.levelSelected.dificultad, {
+            headers: { Authorization: sessionStorage.getItem("token") }
+          })
           .then(response => {
             this.generateEstanterias(response.data);
-            console.log(response.data)
+            console.log(response.data);
+          })
+          .catch(error => {
+            console.error("Error obteniendo el nivel:", error);
           });
       }
     },
@@ -302,7 +316,7 @@ export default {
       }, initialValue);
     },
     inicio() {
-      this.$router.push({ name: 'home' });
+      this.$router.push({ name: 'inicio' });
     },
     downShelf() {
       if (this.estanteria > 1)
@@ -314,7 +328,12 @@ export default {
     },
     async checkNewLevelValidity(levelName) {
       try {
-        const response = await axios.get(this.url + `/level/${levelName}`);
+        const token = sessionStorage.getItem("token");
+        console.log('token:', token);
+        const response = await axios.get(this.url + `/level/${levelName}`, {
+            headers: { Authorization: sessionStorage.getItem("token") } // Agregar el token en la cabecera
+        });
+        console.log('response niveles 336,', response.data);
         this.newLevelValid = response.data.length === 0;
       } catch (error) {
         console.error('Error checking level validity:', error);

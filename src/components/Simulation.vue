@@ -127,17 +127,15 @@ export default {
             appId: "1:397583631129:web:228b0b87af968792d53b88"
         };
 
-        // Initialize Firebase
-        this.app = initializeApp(this.firebaseConfig);
-        // Initialize Cloud Firestore and get a reference to the service
-        this.db = getFirestore(this.app);
-        let unsub = onSnapshot(doc(this.db, "results", this.doc), (doc) => {
-                if(!this.resultReceived && doc.data().tiempo){
+        axios.get(this.url + '/result', {
+        headers: { Authorization: token } // Agrega el token al header
+        }).then((res) => {
+                if(!this.resultReceived && res.data().tiempo){
                     this.resultReceived = true
-                    this.timeTest = doc.data().tiempo
-                    this.stimulusTime = doc.data().tiempoEstimulo
+                    this.timeTest = res.data().tiempo
+                    this.stimulusTime = res.data().tiempoEstimulo
                     
-                    let result = doc.data().productos
+                    let result = res.data().productos
                     if (JSON.stringify(result[0]) != '{}') {
                         let prods = Object.values(result)
                         prods.forEach((element) => {   
@@ -150,12 +148,14 @@ export default {
                 } 
         });
 
-
-        axios.get(this.url + '/level/remember/' + this.nivel).then((res) => {
+        const token = localStorage.getItem("token"); 
+        axios.get(this.url + '/level/remember/' + this.nivel, {
+        headers: { Authorization: token } // Agrega el token al header
+        }).then((res) => {
             this.remember = res.data
-            this.prodsToFind = JSON.parse(JSON.stringify(this.remember));
-            this.prodsToFind = this.prodsToFind.filter(prod => prod.cantidad != 0)
-            this.prodAux = JSON.parse(JSON.stringify(this.remember));
+            this.prodsToFind = this.remember;
+            this.prodsToFind = this.prodsToFind.filter(prod => prod.cantidad_producto != 0)
+            this.prodAux = this.remember;
         })
 
     },
@@ -234,7 +234,7 @@ export default {
             }
         },
         inicio(){
-            this.$router.push({ name: 'home'})
+            this.$router.push({ name: 'inicio'})
         },
         productName(id){
             let name = this.productsName.find(x => x.id == id)

@@ -48,28 +48,34 @@ export default {
     };
   },
   methods: {
+  
     async inicio() {
-      try {
-        const response = await axios.post(`${this.url}/login`, {
-          dni: this.dni,
-          password: this.password,
+    try {
+        const response = await axios.post(this.url + "/login", {
+            dni: this.dni,
+            password: this.password,
         });
+
         if (response.data.success) {
-          this.$router.push({ name: "inicio" });
+            sessionStorage.setItem("token", response.data.token); // Guarda el DNI como token
+            console.log("Token guardado:", response.data.token);
+            this.$router.push({ name: "inicio" });
         } else {
-          this.error = response.data.message || "DNI o Contraseña incorrectos";
+            this.error = response.data.message || "DNI o Contraseña incorrectos";
         }
-      } catch (error) {
+    } catch (error) {
         this.error = "Error al iniciar sesión. Inténtalo de nuevo.";
-        // this.$router.push({ name: "login" });
         console.error("Login error:", error);
-      }
+    }
+}
+
+      
     },
     registro() {
       this.$router.push({ name: "registro" });
     },
-  },
-};
+  };
+  
 </script>
 
 <style lang="scss" scoped>
